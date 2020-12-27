@@ -16,7 +16,7 @@
               <use xlink:href="../../../node_modules/@coreui/icons/sprites/free.svg#cil-inbox"></use>
             </svg> My buckets</a>
           <ul class="c-sidebar-nav-dropdown-items">
-            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="#"><span class="c-sidebar-nav-icon"></span> Breadcrumb</a></li>
+            <li class="c-sidebar-nav-item" v-for="bucket in buckets" @click="showBucketContent(bucket.name)" v-bind:key="bucket.name"><a class="c-sidebar-nav-link" href="#"><span class="c-sidebar-nav-icon"></span> {{bucket.name}}</a></li>
           </ul>
         </li>
         <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="#">
@@ -30,13 +30,34 @@
     </div>
 </template>
 <script>
+import axios from 'axios'
+import store from "../store";
+
 export default {
+  data() {
+    return {
+      buckets: []
+    }
+  },
   mounted() {
-    this.fetchBuckets()
+    this.fetchBuckets();
   },
   methods: {
     fetchBuckets() {
-      
+      axios.get(process.env.MIX_API_URL + "s3/buckets/all").then((response) => {
+        let items = response.data.data;
+
+        items.forEach(element => {
+          this.buckets.push({
+            name: element.Name
+          })
+        });
+
+        console.log(this.buckets);
+      });  
+    },
+    showBucketContent(bucket) {
+      store.dispatch("changeBucket", bucket);
     }
   }
 }

@@ -11,14 +11,14 @@
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend"><span class="input-group-text">
                                     <svg class="c-icon">
-                                        <use xlink:href="node_modules/@coreui/icons/sprites/free.svg#cil-user"></use>
+                                        <use xlink:href="../../../node_modules/@coreui/icons/sprites/free.svg#cil-user"></use>
                                     </svg></span></div>
                                     <input class="form-control" type="email" placeholder="Email" v-model="email">
                                 </div>
                                 <div class="input-group mb-4">
                                     <div class="input-group-prepend"><span class="input-group-text">
                                         <svg class="c-icon">
-                                            <use xlink:href="node_modules/@coreui/icons/sprites/free.svg#cil-lock-locked"></use>
+                                            <use xlink:href="../../../node_modules/@coreui/icons/sprites/free.svg#cil-lock-locked"></use>
                                         </svg></span></div>
                                     <input class="form-control" type="password" placeholder="Password"  v-model="password">
                                 </div>

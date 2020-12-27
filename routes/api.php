@@ -14,6 +14,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::get('s3/buckets/all', 'AWS\AWSController@getAllBuckets');
+Route::get('s3/buckets/{bucket}', 'AWS\AWSController@getBucketItems');
+

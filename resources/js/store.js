@@ -8,11 +8,17 @@ export default new Vuex.Store({
     user: {
       loggedIn: false,
       data: null
-    }
+    },
+
+    bucket: null
   },
   getters: {
     user(state){
       return state.user
+    },
+
+    bucket(state) {
+      return state.bucket
     }
   },
   mutations: {
@@ -21,6 +27,9 @@ export default new Vuex.Store({
     },
     SET_USER(state, data) {
       state.user.data = data;
+    },
+    SET_CURRENT_BUCKET(state, value) {
+      state.bucket = value;
     }
   },
   actions: {
@@ -34,6 +43,9 @@ export default new Vuex.Store({
       } else {
         commit("SET_USER", null);
       }
+    },
+    changeBucket({commit}, bucket) {
+      commit("SET_CURRENT_BUCKET", bucket);
     }
   }
 })
