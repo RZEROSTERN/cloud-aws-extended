@@ -17,16 +17,19 @@
                                             <div class="btn-toolbar d-none d-md-block" role="toolbar" aria-label="Toolbar with buttons">
                                                 <div class="btn-group btn-group-toggle mx-3" data-toggle="buttons">
                                                     <label class="btn btn-outline-secondary">
-                                                        <input id="option1" type="radio" name="options" autocomplete="off" @click="viewMode('icons')"> Icons
+                                                        <input id="option1" type="radio" name="options" autocomplete="off" checked="" @click="viewMode('icons')"> Icons
                                                     </label>
                                                     <label class="btn btn-outline-secondary active">
-                                                        <input id="option2" type="radio" name="options" autocomplete="off" checked="" @click="viewMode('list')"> List
+                                                        <input id="option2" type="radio" name="options" autocomplete="off" @click="viewMode('list')"> List
                                                     </label>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="c-chart-wrapper" style="height:300px;margin-top:40px;">
-                                            <!-- Le contenido -->
+                                        <br>
+                                        <div class="c-chart-wrapper">
+                                            <div class="row">
+                                                <ItemCard v-for="item in items" v-bind:key="item" :itemName="item"/>
+                                            </div>
                                         </div>
                                     </div>
                                     <div v-else>
@@ -51,18 +54,26 @@ import axios from 'axios'
 import Sidebar from '../components/Sidebar.vue'
 import Header from '../components/Header.vue'
 import Footer from '../components/Footer.vue'
+import ItemCard from '../components/ItemCard.vue'
 
 Vue.component('Sidebar', Sidebar)
 Vue.component('Header', Header)
 Vue.component('Footer', Footer)
+Vue.component('ItemCard', ItemCard)
 
 export default {
+    data() {
+        return {
+            items: null
+        }
+    },
     mounted() {
         this.$store.watch((state) => {
             return this.$store.state.bucket
         }, (newVal) => {
+            this.items = null
             axios.get(process.env.MIX_API_URL + "s3/buckets/" + newVal).then((response) => {
-                console.log(response);
+                this.items = response.data.data
             });
         }, {
             deep: true
