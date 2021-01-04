@@ -52,12 +52,11 @@ export default {
             name: element.Name
           })
         });
-
-        console.log(this.buckets);
       });  
     },
     showBucketContent(bucket) {
       store.dispatch("changeBucket", bucket);
+      store.dispatch("changePrefix", null);
     }
   }
 }

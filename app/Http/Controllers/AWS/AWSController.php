@@ -3,6 +3,7 @@ namespace App\Http\Controllers\AWS;
 
 use Aws\S3\S3MultiRegionClient;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 
 class AWSController extends Controller
 {
@@ -61,8 +62,7 @@ class AWSController extends Controller
         }
     }
 
-    public function getFolderItems($bucket, $prefix) {
-        // AQUI ME QUEDÉ, FELIZ AÑO NUEVO !!!!
+    public function getPrefixContent($bucket, Request $request) {
         $s3Client = new S3MultiRegionClient([
             'region' => env('MIX_AWS_REGION'),
             'version' => env('MIX_AWS_APIVERSION'),
@@ -74,15 +74,51 @@ class AWSController extends Controller
 
         try {
             $items = [];
-            $objects = $s3->getPaginator('ListObjects', [
+            $objects = $s3Client->getPaginator('ListObjects', [
                 'Bucket' => $bucket,
                 'Delimiter' => '/',
-                'Prefix' => $prefix
+                'Prefix' => $request->post('prefix')
             ]);
+
+            foreach($objects as $object) {
+                foreach($object['Contents'] as $content) {
+                    $val = str_replace($request->post('prefix'), "", $content['Key']);
+
+                    if($val !== "") {
+                        $items[] = $val;
+                    }
+                }
+            }
 
             return response()->json(['success' => true, 'data' => $items], $this->successStatus);
         } catch(S3Exception $e) {
             return response()->json(['success' => false, 'message' => 'Error al mostrar los elementos', 'stack' => $e]);
         }
+    }
+
+    public function getContentUri(Request $request) {
+        $responseArray = [];
+
+        $s3Client = new S3MultiRegionClient([
+            'region' => env('MIX_AWS_REGION'),
+            'version' => env('MIX_AWS_APIVERSION'),
+            'credentials' => [
+                'key' => env('MIX_AWS_KEY'),
+                'secret' => env('MIX_AWS_SECRET')
+            ],
+        ]);
+
+        $cmd = $s3Client->getCommand('GetObject', [
+            'Bucket' => $request->post('bucket'),
+            'Key' => $request->post('uri')
+        ]);
+
+        $request = $s3Client->createPresignedRequest($cmd, '+1 hours');
+        $mainUri = $request->getUri();
+
+        $responseArray['success'] = true;
+        $responseArray["path"] = $mainUri->getScheme() . "://" . $mainUri->getHost() . $mainUri->getPath() . "?" . $mainUri->getQuery();
+
+        return response()->json($responseArray, $this->successStatus);
     }
 }

@@ -16,4 +16,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('s3/buckets/all', 'AWS\AWSController@getAllBuckets');
 Route::get('s3/buckets/{bucket}', 'AWS\AWSController@getBucketItems');
+Route::post('s3/buckets/{bucket}/prefix', 'AWS\AWSController@getPrefixContent');
+Route::post('s3/item', 'AWS\AWSController@getContentUri');
 

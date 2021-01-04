@@ -14,21 +14,27 @@
                 <svg class="c-icon c-icon-4xl" v-if="kind === null">
                     <use xlink:href="../../../node_modules/@coreui/icons/sprites/free.svg#cil-file"></use>
                 </svg>
+                <img :src="imgUri" :alt="itemName" v-if="kind === 'image'" class="image-thumbnail">
                 <p class="item-name-label">{{itemName}}</p>
             </div>
         </div>
     </div>
 </template>
 <script>
+import store from "../store";
+import axios from 'axios';
+
 export default {
     props: ['itemName'],
     data() {
         return {
             extensionsDictionary: {
                 audio : ["mp3", "ogg"],
-                video : ["mp4", "mkv"]
+                video : ["mp4", "mkv"],
+                image : ["JPG", "png"]
             },
-            kind: null
+            kind: null,
+            imgUri: null
         }
     },
     mounted() {
@@ -53,13 +59,40 @@ export default {
                     return
                 }
             });
+
+            this.extensionsDictionary.image.forEach(element => {
+                if(this.itemName.search(element) !== -1) {
+                    this.kind = "image"
+                    this.getContentUri();
+                    return
+                }
+            });
         },
         checkContents() {
             if(this.kind === "folder") {
-                alert("I should get new items from this folder");
+                store.dispatch("changePrefix", this.itemName);
             } else {
-                alert("I should open or download the content");
+                this.getContentUri()
             }
+        },
+        getContentUri() {
+            let uriStr = ""
+                
+            if(this.$store.state.prefix !== null){
+                uriStr = `${this.$store.state.prefix}${this.itemName}`
+            } else {
+                uriStr = `${this.itemName}`
+            }
+
+            const config = { uri: uriStr, bucket: this.$store.state.bucket }
+
+            axios.post(process.env.MIX_API_URL + "s3/item",config).then((response) => {
+                if(this.kind === 'image') {
+                    this.imgUri = response.data.path
+                }
+            }).catch((error) => {
+                console.log(error)
+            })
         }
     }
 }

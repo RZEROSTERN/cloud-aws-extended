@@ -27,7 +27,7 @@
                                         </div>
                                         <br>
                                         <div class="c-chart-wrapper">
-                                            <div class="row">
+                                            <div class="row" v-if="kindView === 'icons'">
                                                 <ItemCard v-for="item in items" v-bind:key="item" :itemName="item"/>
                                             </div>
                                         </div>
@@ -64,20 +64,49 @@ Vue.component('ItemCard', ItemCard)
 export default {
     data() {
         return {
-            items: null
+            items: null, kindView: "icons"
         }
     },
     mounted() {
         this.$store.watch((state) => {
             return this.$store.state.bucket
-        }, (newVal) => {
+        }, (newVal, oldVal) => {
             this.items = null
-            axios.get(process.env.MIX_API_URL + "s3/buckets/" + newVal).then((response) => {
-                this.items = response.data.data
-            });
+
+            if(newVal !== null && newVal !== oldVal){
+                axios.get(process.env.MIX_API_URL + "s3/buckets/" + newVal).then((response) => {
+                    this.items = response.data.data
+                }).catch((error) => {
+                    console.log(error)
+                })
+            }
         }, {
             deep: true
         })
+
+        this.$store.watch((state) => {
+            return this.$store.state.prefix
+        }, (newVal, oldVal) => {
+            this.items = null
+            
+            if(newVal !== null && newVal !== oldVal) {
+                const config = { prefix: this.$store.state.prefix }
+
+                axios.post(process.env.MIX_API_URL + "s3/buckets/" + this.$store.state.bucket + "/prefix", 
+                config).then((response) => {
+                    this.items = response.data.data
+                }).catch((error) => {
+                    console.log(error)
+                })
+            }
+        }, {
+            deep: true
+        })
+    },
+    methods: {
+        viewMode(view) {
+            this.kindView = view
+        }
     }
 }
 </script>

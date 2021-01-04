@@ -1,3 +1,4 @@
+import { isNull } from "lodash"
 import Vue from "vue"
 import Vuex from "vuex"
 
@@ -9,8 +10,8 @@ export default new Vuex.Store({
       loggedIn: false,
       data: null
     },
-
-    bucket: null
+    bucket: null,
+    prefix: null
   },
   getters: {
     user(state){
@@ -19,6 +20,10 @@ export default new Vuex.Store({
 
     bucket(state) {
       return state.bucket
+    },
+
+    prefix(state) {
+      return state.prefix
     }
   },
   mutations: {
@@ -30,6 +35,9 @@ export default new Vuex.Store({
     },
     SET_CURRENT_BUCKET(state, value) {
       state.bucket = value;
+    },
+    SET_CURRENT_PREFIX(state, value) {
+      state.prefix = value;
     }
   },
   actions: {
@@ -46,6 +54,9 @@ export default new Vuex.Store({
     },
     changeBucket({commit}, bucket) {
       commit("SET_CURRENT_BUCKET", bucket);
+    },
+    changePrefix({commit}, prefix) {
+      commit("SET_CURRENT_PREFIX", prefix);
     }
   }
 })
